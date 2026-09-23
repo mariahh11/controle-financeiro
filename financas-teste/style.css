@@ -1,0 +1,49 @@
+:root {
+    --laranja: #F8910C;
+    --amarelo: #FFCD2C;
+    --bege: #FBDECC;
+    --amarelo-claro: #E8E7B5;
+    --verde-claro: #B3C56E;
+    --verde-escuro: #707D4E;
+}
+
+body{
+    background-color: var(--bege);
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+}
+
+main{
+    padding: 40px;
+}
+
+h1, h2{
+    color: var(--verde-escuro);
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+h1{
+    font-size: 40px;
+}
+
+h2{
+    font-size: 24px;
+}
+
+#introducao{
+    color: darkolivegreen;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+#dashboard{
+    display: flex;
+    gap: 50px;
+}
+
+#cartao-saldo{
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+}

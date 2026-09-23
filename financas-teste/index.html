@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finanças Teste</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <h1>Meu Controle Financeiro</h1>
+        <p id="introducao">Olá! Aqui está o resumo das suas finanças.</p>
+
+        <section id="dashboard">
+            <div id="cartao-saldo">
+                <h2>Saldo</h2>
+                <p id="valor-saldo">R$ 0,00</p>
+            </div>
+            <div id="cartao-receitas">
+                 <h2>Receitas</h2>
+                <p id="valor-receitas">R$ 0,00</p>
+            </div>
+            <div id="cartao-despesas">
+                 <h2>Despesas</h2>
+                <p id="valor-despesas">R$ 0,00</p>
+            </div>
+        </section>
+        <section id="movimentacoes">
+            <h2>Movimentações</h2>
+            <div>
+                <label for="descricao">Descrição</label>
+                <input type="text" id="descricao" placeholder="Ex: Supermercado">
+            </div>
+            <div>
+                <label for="valor">Valor</label>
+                <input type="number" id="valor" placeholder="0,00">
+            </div>
+            <div>
+                <label for="tipo">Tipo</label>
+                <select name="selecionar-tipo" id="tipo">
+                    <option value="receita">Receita</option>
+                    <option value="despesa">Despesa</option>
+                </select>
+            </div>
+            <div>
+                <label for="data">Data</label>
+                <input type="date" id="data">
+            </div>
+            <div>
+                <button id="add-movimentacao">Adicionar</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
