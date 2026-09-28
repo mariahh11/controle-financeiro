@@ -16,37 +16,14 @@ const valorDespesa = document.getElementById("valor-despesas");
 let movimentacoes = [];
 
 
-let indiceEditando = null;
-
-
 const dadosSalvos = localStorage.getItem("movimentacoes");
 
 if (dadosSalvos){
     movimentacoes = JSON.parse(dadosSalvos);
 };
 
-//Atualizar valor dos cartões
-function atualizarResumo(){
-    let receitas = 0;
-    let despesas = 0;
 
-    movimentacoes.forEach(function(movimentacao){
-        if (movimentacao.tipo === "receita"){
-            receitas += movimentacao.valor;
-        }
-
-        if (movimentacao.tipo === "despesa"){
-            despesas += movimentacao.valor;
-        }
-
-    });
-
-    const saldo = receitas - despesas;
-
-    valorSaldo.textContent = `R$ ${saldo.toFixed(2)}`;
-    valorReceita.textContent = `R$ ${receitas.toFixed(2)}`;
-    valorDespesa.textContent = `R$ ${despesas.toFixed(2)}`;
-}
+let indiceEditando = null;
 
 //Verificar se existe algum campo que não foi preenchido, impede o usuário de continuar caso o campo esteja vazio
 function verificarCampo(){
@@ -57,6 +34,53 @@ function verificarCampo(){
 
     return true;
 };
+
+function verificarValor(movimentacao){
+    if (movimentacao.valor === 0){
+        alert("Erro - O valor não pode ser 0");
+        return false
+    }
+
+    if(movimentacao.valor < 0){
+        alert("Erro - Não pode ser menor que zero")
+        return false;
+    }
+
+    return true;
+}
+
+function verificarData(movimentacao){
+    const hoje = new Date().toISOString().split("T")[0];
+
+    if (movimentacao.data > hoje){
+        alert("Erro - A data não pode ser futura");
+        return false;
+    }
+
+    return true;
+}
+
+//Atualizar valor dos cartões
+function atualizarResumo(){
+    let receitas = 0;
+    let despesas = 0;
+
+    if (movimentacao.tipo === "receita"){
+        receitas += movimentacao.valor;
+    };
+
+    if (movimentacao.tipo === "despesa"){
+        despesas += movimentacao.valor;
+    };
+
+
+    const saldo = receitas - despesas;
+
+    valorSaldo.textContent = `R$ ${saldo.toFixed(2)}`;
+    valorReceita.textContent = `R$ ${receitas.toFixed(2)}`;
+    valorDespesa.textContent = `R$ ${despesas.toFixed(2)}`;
+};
+
 
 function formatarMoeda(valor){
     return valor.toLocaleString("pt-BR", {
@@ -175,6 +199,15 @@ botao.addEventListener("click", function(){
         tipo: tipoSelecionado,
         data: dataSelecionada
     };
+
+    if (!verificarValor(movimentacao)){
+        return;
+    };
+
+    if (!verificarData(movimentacao)){
+        return;
+    }
+
 
     //Substituir a movimentação está sendo editada
     if (indiceEditando === null){
