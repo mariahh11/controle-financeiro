@@ -28,9 +28,6 @@ O projeto foi desenvolvido para praticar e aprimorar conhecimentos em desenvolvi
 
 ## Estrutura do projeto
 
-
-## Estrutura do projeto
-
 ```text
 controle-financeiro/
 ├── index.html
