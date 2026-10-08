@@ -1,100 +1,122 @@
-//Variáveis
+//===========================================================
+//Váriaveis
+//===========================================================
+
+//Elementos do formulário
 const descricao = document.getElementById("descricao");
 const valor = document.getElementById("valor");
 const tipo = document.getElementById("tipo");
 const data = document.getElementById("data");
 const botao = document.getElementById("add-movimentacao");
-
 const listaMovimentacoes = document.getElementById("lista-movimentacoes");
 
-//Variáveis cartões
+//Elementos dos cartões
 const valorSaldo = document.getElementById("valor-saldo");
 const valorReceita = document.getElementById("valor-receitas");
 const valorDespesa = document.getElementById("valor-despesas");
+const mensagemErro = document.getElementById("mensagem-erro");
 
-//Array
+
+
+//===========================================================
+//Dados
+//===========================================================
+
 let movimentacoes = [];
-
+let indiceEditando = null;
 
 const dadosSalvos = localStorage.getItem("movimentacoes");
 
 if (dadosSalvos){
     movimentacoes = JSON.parse(dadosSalvos);
-};
+}
 
 
-let indiceEditando = null;
+//===========================================================
+//Validações
+//===========================================================
 
-//Verificar se existe algum campo que não foi preenchido, impede o usuário de continuar caso o campo esteja vazio
+//Verifica se algum campo não foi preenchido
 function verificarCampo(){
     if (descricao.value === "" || valor.value === "" || data.value === ""){
-        alert("Preencha todos os campos.");
-        return false;
-    }
-
-    return true;
-};
-
-function verificarValor(movimentacao){
-    if (movimentacao.valor === 0){
-        alert("Erro - O valor não pode ser 0");
-        return false
-    }
-
-    if(movimentacao.valor < 0){
-        alert("Erro - Não pode ser menor que zero")
+        mensagemErro.textContent = "Todos os campos devem ser preenchidos";
         return false;
     }
 
     return true;
 }
 
+//Verifica se o valor é inválido (<=0)
+function verificarValor(movimentacao){
+    if (movimentacao.valor <= 0){
+        mensagemErro.textContent = "O valor deve ser maior que 0";
+        return false;
+    }
+
+    return true;
+}
+
+
+//Verifica se a data é inválida
 function verificarData(movimentacao){
     const hoje = new Date().toISOString().split("T")[0];
 
     if (movimentacao.data > hoje){
-        alert("Erro - A data não pode ser futura");
+        mensagemErro.textContent = "Data inválida"
         return false;
     }
 
     return true;
 }
 
-//Atualizar valor dos cartões
-function atualizarResumo(){
-    let receitas = 0;
-    let despesas = 0;
-
-    if (movimentacao.tipo === "receita"){
-        receitas += movimentacao.valor;
-    };
-
-    if (movimentacao.tipo === "despesa"){
-        despesas += movimentacao.valor;
-    };
-
-
-    const saldo = receitas - despesas;
-
-    valorSaldo.textContent = `R$ ${saldo.toFixed(2)}`;
-    valorReceita.textContent = `R$ ${receitas.toFixed(2)}`;
-    valorDespesa.textContent = `R$ ${despesas.toFixed(2)}`;
-};
-
+//===========================================================
+//Formatações
+//===========================================================
 
 function formatarMoeda(valor){
     return valor.toLocaleString("pt-BR", {
         style: "currency",
         currency: "BRL"
     });
-};
+}
 
 function formatarData(data){
     const partes = data.split("-");
 
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
-};
+}
 
+
+//===========================================================
+//Resumo
+//===========================================================
+
+//Atualiza o resumo das movimentações
+function atualizarResumo(){
+    let receitas = 0;
+    let despesas = 0;
+
+    movimentacoes.forEach(function(movimentacao){
+        if (movimentacao.tipo === "receita"){
+            receitas += movimentacao.valor;
+        };
+
+        if (movimentacao.tipo === "despesa"){
+            despesas += movimentacao.valor;
+        };
+    });
+
+
+    const saldo = receitas - despesas;
+
+    valorSaldo.textContent = formatarMoeda(saldo);
+    valorReceita.textContent = formatarMoeda(receitas);
+    valorDespesa.textContent = formatarMoeda(despesas);
+}
+
+//===========================================================
+//Movimentações
+//===========================================================
 
 //Cria uma div e seus elementos para cada movimentação, assim fica mais organizado visualmente
 function mostrarMovimentacoes(){
@@ -116,7 +138,7 @@ function mostrarMovimentacoes(){
         const tipoItem = document.createElement("p");
         const dataItem = document.createElement("p");
         const botaoExcluir = document.createElement("button");
-        const botaoAtualizar = document.createElement("button");
+        const botaoEditar = document.createElement("button");
 
         const informacoes = document.createElement("div");
         const detalhes = document.createElement("div");
@@ -124,7 +146,7 @@ function mostrarMovimentacoes(){
         informacoes.classList.add("informacoes");
         detalhes.classList.add("detalhes");
         botaoExcluir.classList.add("botao-excluir");
-        botaoAtualizar.classList.add("botao-atualizar");
+        botaoEditar.classList.add("botao-editar");
 
         //Adicionando elemento na div de lista de movimentações
         titulo.textContent = movimentacao.descricao;
@@ -132,7 +154,7 @@ function mostrarMovimentacoes(){
         tipoItem.textContent = movimentacao.tipo;
         dataItem.textContent = formatarData(movimentacao.data);
         botaoExcluir.textContent = "Excluir";
-        botaoAtualizar.textContent = "Editar";
+        botaoEditar.textContent = "Editar";
 
         //Add titulo e o valor da movimentação na div de informações
         informacoes.appendChild(titulo);
@@ -145,12 +167,18 @@ function mostrarMovimentacoes(){
         //Add todas as informações + botões na div de movimentação
         item.appendChild(informacoes);
         item.appendChild(detalhes);
-        item.appendChild(botaoAtualizar);
+        item.appendChild(botaoEditar);
         item.appendChild(botaoExcluir)
 
 
         //Botão de excluir as movimentações
         botaoExcluir.addEventListener("click", function(){
+            const confirmar = confirm("Tem certeza que deseja excluir essa movimentação?")
+
+            if (!confirmar){
+                return;
+            }
+
             movimentacoes.splice(indice, 1)
 
             localStorage.setItem(
@@ -163,7 +191,7 @@ function mostrarMovimentacoes(){
         });
 
         //Botão para editar as informações das movimentações
-        botaoAtualizar.addEventListener("click", function(){
+        botaoEditar.addEventListener("click", function(){
             indiceEditando = indice;
 
             descricao.value = movimentacao.descricao;
@@ -179,10 +207,17 @@ function mostrarMovimentacoes(){
         
     });
 
-};
+}
+
+
+//===========================================================
+//Adicionar/Editar
+//===========================================================
 
 //Adiciona Receita/Despesa toda vez que o botão adicionar é clicado
 botao.addEventListener("click", function(){
+
+    mensagemErro.textContent = "";
 
     if (!verificarCampo()){
         return;
@@ -198,11 +233,11 @@ botao.addEventListener("click", function(){
         valor: valorDigitado,
         tipo: tipoSelecionado,
         data: dataSelecionada
-    };
+    }
 
     if (!verificarValor(movimentacao)){
         return;
-    };
+    }
 
     if (!verificarData(movimentacao)){
         return;
@@ -232,6 +267,10 @@ botao.addEventListener("click", function(){
     data.value = "";
 
 })
+
+//===========================================================
+//Inicialização
+//===========================================================
 
 mostrarMovimentacoes();
 atualizarResumo();
